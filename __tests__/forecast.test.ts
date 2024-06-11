@@ -46,6 +46,8 @@ describe('The request method should work correctly', () => {
             azimuth: 0,
             declination: 0,
             kwp: 0,
+            dampingEvening: 0,
+            dampingMorning: 0,
         });
 
         const result = await instance.request('test');

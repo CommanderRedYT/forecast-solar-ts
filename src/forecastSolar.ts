@@ -32,12 +32,12 @@ class ForecastSolar {
         this.kwp = options.kwp;
         this.latitude = options.latitude;
         this.longitude = options.longitude;
-        this.apiKey = options.apiKey || null;
-        this.damping = options.damping || 0;
-        this.dampingMorning = options.dampingMorning || null;
-        this.dampingEvening = options.dampingEvening || null;
-        this.horizon = options.horizon || null;
-        this.inverter = options.inverter || null;
+        this.apiKey = options.apiKey ?? null;
+        this.damping = options.damping ?? 0;
+        this.dampingMorning = options.dampingMorning ?? null;
+        this.dampingEvening = options.dampingEvening ?? null;
+        this.horizon = options.horizon ?? null;
+        this.inverter = options.inverter ?? null;
 
         if (options.baseEndpoint) {
             this.baseEndpoint = options.baseEndpoint;
