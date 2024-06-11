@@ -100,7 +100,7 @@ export class Estimate {
     }
 
     dayProduction(day: moment.Moment): number {
-        const specificDate = day.startOf('day');
+        const specificDate = day.clone().utc().startOf('day');
         const keys = Object.keys(this.whDays);
 
         const key = keys.find((k) => moment(k).isSame(specificDate, 'day'));
