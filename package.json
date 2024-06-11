@@ -24,7 +24,8 @@
     "lint": "eslint . --ext .ts",
     "test": "jest --passWithNoTests",
     "start": "tsup dev",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "postpublish": "git push && git push --tags"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
