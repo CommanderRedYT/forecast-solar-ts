@@ -40,7 +40,7 @@ export class Estimate {
 
     static fromData(data: ForecastSolarData): Estimate {
         if (!('result' in data) || !('watts' in (data as any).result) || !('watt_hours_period' in (data as any).result) || !('watt_hours_day' in (data as any).result)) {
-            throw new Error('Invalid data format');
+            throw new ForecastSolarError('Invalid data format');
         }
 
         return new Estimate(
@@ -106,7 +106,7 @@ export class Estimate {
         const key = keys.find((k) => moment(k).isSame(specificDate, 'day'));
 
         if (key === undefined) {
-            return 0;
+            throw new ForecastSolarError('No production values found');
         }
 
         return this.whDays[key];
@@ -124,7 +124,7 @@ export class Estimate {
             }
         }
 
-        throw new Error('No peak production time found');
+        throw new ForecastSolarError('No peak production time found');
     }
 
     powerProductionAtTime(time: moment.Moment): number | null {
