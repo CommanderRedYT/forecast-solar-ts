@@ -4,4 +4,5 @@ module.exports = {
     testEnvironment: 'node',
     setupFiles: ['<rootDir>/jest.setup.js'],
     testMatch: ['**/*.test.ts'],
+    coveragePathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/__tests__/'],
 };
