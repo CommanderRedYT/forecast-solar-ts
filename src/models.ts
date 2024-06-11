@@ -38,58 +38,12 @@ export class Estimate {
         this.apiTimezone = apiTimezone;
     }
 
-    /*
-    @classmethod
-    def from_dict(cls: type[Estimate], data: dict[str, Any]) -> Estimate:
-        """Return a Estimate object from a Forecast.Solar API response.
-
-        Converts a dictionary, obtained from the Forecast.Solar API into
-        a Estimate object.
-
-        Args:
-        ----
-            data: The estimate response from the Forecast.Solar API.
-
-        Returns:
-        -------
-            An Estimate object.
-
-        """
-        return cls(
-            watts={
-                datetime.fromisoformat(d): w for d, w in data["result"]["watts"].items()
-            },
-            wh_period={
-                datetime.fromisoformat(d): e
-                for d, e in data["result"]["watt_hours_period"].items()
-            },
-            wh_days={
-                datetime.fromisoformat(d): e
-                for d, e in data["result"]["watt_hours_day"].items()
-            },
-            api_rate_limit=data["message"]["ratelimit"]["limit"],
-            api_timezone=data["message"]["info"]["timezone"],
-        )
-     */
-
     static fromData(data: ForecastSolarData): Estimate {
         if (!('result' in data) || !('watts' in (data as any).result) || !('watt_hours_period' in (data as any).result) || !('watt_hours_day' in (data as any).result)) {
-            throw new Error('Invalid data format');
+            throw new ForecastSolarError('Invalid data format');
         }
 
         return new Estimate(
-            /*
-            {
-                [(data as any).result.watts.map((d: string) => moment(d).toDate())]: (data as any).result.watts.values(),
-            },
-            {
-                [(data as any).result.watt_hours_period.map((d: string) => moment(d).toDate())]: (data as any).result.watt_hours_period.values(),
-            },
-            {
-                [(data as any).result.watt_hours_day.map((d: string) => moment(d).toDate())]: (data as any).result.watt_hours_day.values(),
-            },
-            (data as any).message.ratelimit.limit,
-            (data as any).message.info.timezone, */
             (data as any).result.watts,
             (data as any).result.watt_hours_period,
             (data as any).result.watt_hours_day,
@@ -146,13 +100,13 @@ export class Estimate {
     }
 
     dayProduction(day: moment.Moment): number {
-        const specificDate = day.startOf('day');
+        const specificDate = day.clone().utc().startOf('day');
         const keys = Object.keys(this.whDays);
 
         const key = keys.find((k) => moment(k).isSame(specificDate, 'day'));
 
         if (key === undefined) {
-            return 0;
+            throw new ForecastSolarError('No production values found');
         }
 
         return this.whDays[key];
@@ -170,7 +124,7 @@ export class Estimate {
             }
         }
 
-        throw new Error('No peak production time found');
+        throw new ForecastSolarError('No peak production time found');
     }
 
     powerProductionAtTime(time: moment.Moment): number | null {
