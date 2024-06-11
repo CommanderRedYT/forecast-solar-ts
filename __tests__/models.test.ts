@@ -86,7 +86,7 @@ describe('Test estimated forecast', () => {
         expect(route).toHaveBeenCalledTimes(1);
     });
 
-    it('should returm a forecast with subscription', async () => {
+    it('should return a forecast with subscription', async () => {
         jest.useFakeTimers()
             .setSystemTime(new Date('2024-04-27T07:00:00+02:00'));
 
@@ -129,6 +129,160 @@ describe('Test estimated forecast', () => {
         expect(subscribedForecast.sumEnergyProduction(6)).toBe(2802);
         expect(subscribedForecast.sumEnergyProduction(12)).toBe(5582);
         expect(subscribedForecast.sumEnergyProduction(24)).toBe(5784);
+
+        expect(route).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return a forecast with professional type', async () => {
+        jest.useFakeTimers()
+            .setSystemTime(new Date('2024-04-27T07:00:00+02:00'));
+
+        const route = mockServer.get(`/${subscribedClientOptions.apiKey}/estimate/52.16/4.47/20/10/2.16`).mockImplementationOnce((ctx) => {
+            ctx.status = 200;
+            ctx.set('X-Ratelimit-Limit', '100');
+            ctx.set('X-Ratelimit-Period', '60');
+            ctx.set('X-Ratelimit-Remaining', '99');
+            ctx.body = loadFixtureJSON('forecast_professional.jsonc');
+        });
+
+        const url = mockServer.getURL();
+
+        const instance = new ForecastSolar({
+            ...subscribedClientOptions,
+            baseEndpoint: url.toString(),
+        });
+
+        const subscribedForecast = await instance.estimate();
+        expect(subscribedForecast).toMatchSnapshot('snapshot3');
+        expect(subscribedForecast.timezone).toBe('Europe/Amsterdam');
+        expect(subscribedForecast.accountType).toBe(AccountType.Professional);
+
+        expect(route).toHaveBeenCalledTimes(1);
+    });
+
+    it('should raise an error with invalid data', async () => {
+        jest.useFakeTimers()
+            .setSystemTime(new Date('2024-06-11T12:00:00+02:00'));
+
+        const route = mockServer.get('/estimate/48.21/16.36/23.44/180/5').mockImplementationOnce((ctx) => {
+            ctx.status = 200;
+            ctx.set('X-Ratelimit-Limit', '100');
+            ctx.set('X-Ratelimit-Period', '60');
+            ctx.set('X-Ratelimit-Remaining', '99');
+            ctx.body = loadFixtureJSON('invalid_forecast.jsonc');
+        });
+
+        const url = mockServer.getURL();
+
+        const instance = new ForecastSolar({
+            ...clientOptions,
+            baseEndpoint: url.toString(),
+        });
+
+        await expect(instance.estimate()).rejects.toThrowErrorMatchingSnapshot('invalid_data');
+
+        expect(route).toHaveBeenCalledTimes(1);
+    });
+
+    it('should raise an error because headers are missing', async () => {
+        jest.useFakeTimers()
+            .setSystemTime(new Date('2024-06-11T12:00:00+02:00'));
+
+        const route = mockServer.get('/estimate/48.21/16.36/23.44/180/5').mockImplementationOnce((ctx) => {
+            ctx.status = 200;
+            ctx.body = loadFixtureJSON('invalid_forecast.jsonc');
+        });
+
+        const url = mockServer.getURL();
+
+        const instance = new ForecastSolar({
+            ...clientOptions,
+            baseEndpoint: url.toString(),
+        });
+
+        await expect(instance.estimate()).rejects.toThrowErrorMatchingSnapshot('headers_missing');
+
+        expect(route).toHaveBeenCalledTimes(1);
+    });
+
+    it('should parse the retry-at header', async () => {
+        jest.useFakeTimers()
+            .setSystemTime(new Date('2024-06-11T12:00:00+02:00'));
+
+        const route = mockServer.get('/estimate/48.21/16.36/23.44/180/5').mockImplementationOnce((ctx) => {
+            ctx.status = 200;
+            ctx.set('X-Ratelimit-Limit', '100');
+            ctx.set('X-Ratelimit-Period', '60');
+            ctx.set('X-Ratelimit-Retry-At', moment().add(10, 'hours').toISOString());
+            ctx.body = loadFixtureJSON('forecast.jsonc');
+        });
+
+        const url = mockServer.getURL();
+
+        const instance = new ForecastSolar({
+            ...clientOptions,
+            baseEndpoint: url.toString(),
+        });
+
+        const result = await instance.estimate();
+
+        expect(result.apiRateLimit).toBe(12);
+
+        expect(route).toHaveBeenCalledTimes(1);
+    });
+
+    it('should raise an error because invalid date', async () => {
+        jest.useFakeTimers()
+            .setSystemTime(new Date('2024-06-11T12:00:00+02:00'));
+
+        const route = mockServer.get('/estimate/48.21/16.36/23.44/180/5').mockImplementationOnce((ctx) => {
+            ctx.status = 200;
+            ctx.set('X-Ratelimit-Limit', '100');
+            ctx.set('X-Ratelimit-Period', '60');
+            ctx.set('X-Ratelimit-Remaining', '99');
+            ctx.body = loadFixtureJSON('forecast.jsonc');
+        });
+
+        const url = mockServer.getURL();
+
+        const instance = new ForecastSolar({
+            ...clientOptions,
+            baseEndpoint: url.toString(),
+        });
+
+        const invalidDay = moment('2026-06-11T12:00:00+02:00');
+
+        const result = await instance.estimate();
+
+        expect(() => result.dayProduction(invalidDay)).toThrowErrorMatchingSnapshot('invalid_date');
+
+        expect(route).toHaveBeenCalledTimes(1);
+    });
+
+    it('should raise an error because no time found', async () => {
+        jest.useFakeTimers()
+            .setSystemTime(new Date('2024-06-11T12:00:00+02:00'));
+
+        const route = mockServer.get('/estimate/48.21/16.36/23.44/180/5').mockImplementationOnce((ctx) => {
+            ctx.status = 200;
+            ctx.set('X-Ratelimit-Limit', '100');
+            ctx.set('X-Ratelimit-Period', '60');
+            ctx.set('X-Ratelimit-Remaining', '99');
+            ctx.body = loadFixtureJSON('forecast.jsonc');
+        });
+
+        const url = mockServer.getURL();
+
+        const instance = new ForecastSolar({
+            ...clientOptions,
+            baseEndpoint: url.toString(),
+        });
+
+        const invalidDay = moment('2026-06-11T12:00:00+02:00');
+
+        const result = await instance.estimate();
+
+        expect(() => result.peakProductionTime(invalidDay)).toThrowErrorMatchingSnapshot('no_time_found');
 
         expect(route).toHaveBeenCalledTimes(1);
     });
