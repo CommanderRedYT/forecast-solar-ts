@@ -23,13 +23,13 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v4
-
-      - name: Cache node modules
-        uses: c-hive/gha-yarn-cache@v1
+        with:
+          node-version: '18'
+          cache: 'yarn'
 
       - name: Install node modules
         run: |
-          yarn install --frozen-lockfile --prefer-offline
+          yarn install --immutable --check-cache
 
       - name: Run tests
         uses: willcaul/jest-github-action@v4
@@ -48,13 +48,13 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v4
-
-      - name: Cache node modules
-        uses: c-hive/gha-yarn-cache@v1
+        with:
+          node-version: '18'
+          cache: 'yarn'
 
       - name: Install node modules
         run: |
-          yarn install --frozen-lockfile --prefer-offline
+          yarn install --immutable --check-cache
 
       - name: Run ESLint
         run: |
@@ -74,13 +74,13 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v4
-
-      - name: Cache node modules
-        uses: c-hive/gha-yarn-cache@v1
+        with:
+          node-version: '18'
+          cache: 'yarn'
 
       - name: Install node modules
         run: |
-          yarn install --frozen-lockfile --prefer-offline
+          yarn install --immutable --check-cache
 
       - name: Run import checks
         continue-on-error: true
