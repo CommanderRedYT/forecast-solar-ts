@@ -1,0 +1,36 @@
+{
+    "extends": ["airbnb-base", "airbnb-typescript/base", "plugin:jest/recommended"],
+    "plugins": ["eslint-plugin-jest"],
+    "ignorePatterns": ["node_modules/", "dist", "public"],
+    "parserOptions": {
+        "project": "./tsconfig.json"
+    },
+    "env": {
+        "jest/globals": true
+    },
+    "rules": {
+        // Fix Airbnb's config
+        "indent": "off",
+        "@typescript-eslint/indent": ["error", 4],
+
+        "no-console": "off",
+
+        "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
+
+        "max-len": "off",
+
+        "no-useless-return": "off",
+
+        "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+
+        "@typescript-eslint/lines-between-class-members": "off",
+
+        "@typescript-eslint/explicit-function-return-type": ["error", {
+            "allowExpressions": true,
+            "allowTypedFunctionExpressions": true,
+            "allowHigherOrderFunctions": true
+        }],
+
+        "no-continue": "off"
+    }
+}

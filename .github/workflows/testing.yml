@@ -1,0 +1,93 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      checks: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Cache node modules
+        uses: c-hive/gha-yarn-cache@v1
+
+      - name: Install node modules
+        run: |
+          yarn install --frozen-lockfile --prefer-offline
+
+      - name: Run tests
+        uses: willcaul/jest-github-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          test-command: "yarn test"
+  lint:
+    name: Run Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Cache node modules
+        uses: c-hive/gha-yarn-cache@v1
+
+      - name: Install node modules
+        run: |
+          yarn install --frozen-lockfile --prefer-offline
+
+      - name: Run ESLint
+        run: |
+          yarn lint --max-warnings=0
+
+  import-checks:
+    name: Run Import Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      checks: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Cache node modules
+        uses: c-hive/gha-yarn-cache@v1
+
+      - name: Install node modules
+        run: |
+          yarn install --frozen-lockfile --prefer-offline
+
+      - name: Run import checks
+        continue-on-error: true
+        run: |
+          yarn link
+          cp -r gh-action-templates/import-check /tmp/import-check
+          pushd /tmp/import-check
+          yarn link stromnetzgraz-api
+          node cjs/index.cjs
+          node esm/index.mjs
+          popd
