@@ -3,7 +3,6 @@ import moment from 'moment';
 import { ForecastSolar, ForecastSolarOptions } from '../src';
 import { loadFixtureJSON } from './utils';
 import { AccountType } from '../src/models';
-import {ForecastSolarError} from "../src/errors";
 
 const clientOptions: ForecastSolarOptions = {
     latitude: 48.21,
