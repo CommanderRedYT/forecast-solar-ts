@@ -11,7 +11,7 @@ It provides functionality to get solar power estimates from the API provided by 
 
 ## Testing
 
-The library has a reported 100% test coverage. You can find them in `__tests__` and run them via the following command:
+The library has a reported 100% test coverage. You can find them in [`__tests__`](https://github.com/CommanderRedYT/forecast-solar-ts/tree/main/__tests__) and run them via the following command:
 
 ```bash
 npm run test
