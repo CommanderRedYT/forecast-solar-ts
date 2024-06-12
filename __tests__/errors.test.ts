@@ -44,7 +44,7 @@ describe('Test errors', () => {
             kwp: 0,
         });
 
-        await expect(instance.request('test')).rejects.toThrow(ForecastSolarRequestError);
+        await expect(() => instance.request('test')).rejects.toThrow(ForecastSolarRequestError);
 
         expect(route).toHaveBeenCalledTimes(1);
     });
@@ -69,7 +69,7 @@ describe('Test errors', () => {
             kwp: 0,
         });
 
-        await expect(instance.request('test')).rejects.toThrow(ForecastSolarAuthenticationError);
+        await expect(() => instance.request('test')).rejects.toThrow(ForecastSolarAuthenticationError);
 
         expect(route).toHaveBeenCalledTimes(1);
     });
@@ -94,7 +94,7 @@ describe('Test errors', () => {
             kwp: 0,
         });
 
-        await expect(instance.request('test')).rejects.toThrow(ForecastSolarConfigError);
+        await expect(() => instance.request('test')).rejects.toThrow(ForecastSolarConfigError);
 
         expect(route).toHaveBeenCalledTimes(1);
     });
@@ -119,7 +119,7 @@ describe('Test errors', () => {
             kwp: 0,
         });
 
-        await expect(instance.request('test')).rejects.toThrow(ForecastSolarRateLimitError);
+        await expect(() => instance.request('test')).rejects.toThrow(ForecastSolarRateLimitError);
 
         expect(route).toHaveBeenCalledTimes(1);
     });
@@ -144,7 +144,7 @@ describe('Test errors', () => {
             kwp: 0,
         });
 
-        await expect(instance.request('test')).rejects.toThrow(ForecastSolarConnectionError);
+        await expect(() => instance.request('test')).rejects.toThrow(ForecastSolarConnectionError);
 
         expect(route).toHaveBeenCalledTimes(1);
     });

@@ -179,7 +179,7 @@ describe('Test estimated forecast', () => {
             baseEndpoint: url.toString(),
         });
 
-        await expect(instance.estimate()).rejects.toThrowErrorMatchingSnapshot('invalid_data');
+        await expect(() => instance.estimate()).rejects.toThrowErrorMatchingSnapshot('invalid_data');
 
         expect(route).toHaveBeenCalledTimes(1);
     });
@@ -200,7 +200,7 @@ describe('Test estimated forecast', () => {
             baseEndpoint: url.toString(),
         });
 
-        await expect(instance.estimate()).rejects.toThrowErrorMatchingSnapshot('headers_missing');
+        await expect(() => instance.estimate()).rejects.toThrowErrorMatchingSnapshot('headers_missing');
 
         expect(route).toHaveBeenCalledTimes(1);
     });
